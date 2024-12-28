@@ -1,6 +1,10 @@
 package learngorm
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 // field gorm ini sebenarnya tidak digunakan tidak masalah, karna sudah otomatis dari go
 type User struct {
@@ -28,4 +32,11 @@ type UserLog struct {
 	Action    string	`gorm:"column:action"`
 	CreatedAt int64 	`gorm:"column:created_at;autoCreateTime:milli;<-:create"`
 	UpdatedAt int64 	`gorm:"column:updated_at;autoCreateTime:milli;autoUpdateTime:milli"`
+}
+
+type Todo struct {
+	gorm.Model
+	UserId    		string				`gorm:"column:user_id"`
+	Title     		string				`gorm:"column:title"`
+	Description     string				`gorm:"column:description"`
 }

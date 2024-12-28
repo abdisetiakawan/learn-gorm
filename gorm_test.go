@@ -330,3 +330,51 @@ func TestConflict(t *testing.T) {
     }).Create(&user).Error
     assert.Nil(t, err)
 }
+
+func TestDelete(t *testing.T) {
+    var user User
+    err := db.Take(&user, "id = ?", "23").Error
+    assert.Nil(t, err)
+
+    err = db.Delete(&user).Error
+    assert.Nil(t, err)
+
+    err = db.Delete(&User{}, "id = ?", "7").Error
+    assert.Nil(t, err)
+
+    err = db.Where("id = ?", "8").Delete(&User{}).Error
+    assert.Nil(t, err)
+}
+
+func TestSoftDelete(t *testing.T) {
+    todo := Todo{
+        UserId: "Erna Damayanti",
+        Title: "Abdi iniiii",
+        Description: "lorem ipsum bla bla bla bla bla bla",
+    }
+
+    err := db.Create(&todo).Error
+    assert.Nil(t, err)
+    
+    err = db.Delete(&todo).Error
+    assert.Nil(t, err)
+    assert.NotNil(t, todo.DeletedAt)
+
+    var todos []Todo
+    err = db.Find(&todos).Error
+    assert.Nil(t, err)
+    assert.Equal(t, 0, len(todos))
+}
+
+func TestUnscoped(t *testing.T) {
+    var todo Todo
+    err := db.Unscoped().Take(&todo, "id = 2").Error
+    assert.Nil(t, err)
+
+    err = db.Unscoped().Delete(&todo).Error
+    assert.Nil(t, err)
+
+    var todos []Todo
+    err = db.Unscoped().Find(&todos).Error
+    assert.Nil(t, err)
+}
