@@ -1,6 +1,7 @@
 package learngorm
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"testing"
@@ -623,4 +624,77 @@ func TestPreloadingAll(t *testing.T) {
     err := db.Preload(clause.Associations).Find(&user, "id = ?", "73").Error
     assert.Nil(t, err)
     fmt.Println(user)
+}
+
+func TestJoinQuery(t *testing.T) {
+    var users []User
+    err := db.Joins("join wallets on wallets.user_id = users.id").Find(&users).Error
+    assert.Nil(t, err)
+    assert.Equal(t, 4, len(users))
+
+    users = []User{}
+    err = db.Joins("Wallet").Find(&users).Error
+    assert.Nil(t, err)
+}
+func TestJoinQueryWithCondition(t *testing.T) {
+    var users []User
+    err := db.Joins("join wallets on wallets.user_id = users.id AND wallets.balance > ?", 1000).Find(&users).Error
+    assert.Nil(t, err)
+    fmt.Println(len(users))
+    assert.Equal(t, 4, len(users))
+
+    users = []User{}
+    err = db.Joins("Wallet").Where("Wallet.balance > ?", 1000).Find(&users).Error
+    assert.Nil(t, err)
+    assert.Equal(t, 4, len(users))
+}
+
+func TestCount(t *testing.T) {
+    var count int64
+    err := db.Model(&User{}).Joins("Wallet").Where("Wallet.balance > ?", 10000).Count(&count).Error
+    assert.Nil(t, err)
+    fmt.Println(count)
+}
+
+type AggregationResult struct {
+    TotalBalance int64
+    MinBalance int64
+    MaxBalance int64
+    AvgBalance float64
+}
+
+func TestAggregation(t *testing.T) {
+    var result AggregationResult
+    err := db.Model(&Wallet{}).Select("sum(balance) as total_balance", "min(balance) as min_balance", "max(balance) as max_balance", "avg(balance) as avg_balance").Take(&result).Error
+    assert.Nil(t, err)
+    fmt.Println(result)
+}
+func TestGroupByHaving(t *testing.T) {
+    var result []AggregationResult
+    err := db.Model(&Wallet{}).Select("sum(balance) as total_balance", "min(balance) as min_balance", "max(balance) as max_balance", "avg(balance) as avg_balance").Joins("User").Group("User.id").Having("sum(balance) > ?", 1000).Find(&result).Error
+    assert.Nil(t, err)
+    fmt.Println(result)
+}
+
+func TestContext(t *testing.T) {
+    ctx := context.Background()
+    var users []User
+    err := db.WithContext(ctx).Find(&users).Error
+    assert.Nil(t, err)
+}
+
+func BrokeBalance(db *gorm.DB) *gorm.DB {
+    return db.Where("balance = ?", 0)
+}
+func RichBalance(db *gorm.DB) *gorm.DB {
+    return db.Where("balance = ?", 0)
+}
+func TestScoped(t *testing.T) {
+    var wallets []Wallet
+    err := db.Scopes(BrokeBalance).Find(&wallets).Error
+    assert.Nil(t, err)
+    wallets = []Wallet{}
+    err = db.Scopes(RichBalance).Find(&wallets).Error
+    assert.Nil(t, err)
+
 }
