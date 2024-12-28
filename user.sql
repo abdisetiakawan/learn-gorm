@@ -62,3 +62,51 @@ CREATE TABLE wallets
 )
 
 SELECT * FROM wallets;
+
+create table addresses
+(
+    id         bigint       not null auto_increment,
+    user_id    varchar(100) not null,
+    address    varchar(100) not null,
+    created_at timestamp    not null default current_timestamp,
+    updated_at timestamp    not null default current_timestamp on update current_timestamp,
+    primary key (id),
+    foreign key (user_id) references users (id)
+) engine = innodb;
+
+desc addresses;
+
+create table products
+(
+    id         varchar(100) not null,
+    name       varchar(100) not null,
+    price      bigint       not null,
+    created_at timestamp    not null default current_timestamp,
+    updated_at timestamp    not null default current_timestamp on update current_timestamp,
+    primary key (id)
+) engine = innodb;
+
+desc products;
+
+create table user_like_product
+(
+    user_id    varchar(100) not null,
+    product_id varchar(100) not null,
+    primary key (user_id, product_id),
+    foreign key (user_id) references users (id),
+    foreign key (product_id) references products (id)
+) engine = innodb;
+
+desc user_like_product;
+
+select * from addresses;
+
+SELECT * FROM `wallets` WHERE id = '2' LIMIT 1;
+
+SELECT * FROM `users` WHERE `users`.`id` = '2';
+
+SELECT * FROM `addresses` WHERE `addresses`.`user_id` = '2';
+
+select * from wallets;
+
+select count(id) from users;

@@ -15,6 +15,8 @@ type User struct {
 	UpdatedAt 	time.Time 	`gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
 	Information string 		`gorm:"-"`
 	Wallet 		Wallet 		`gorm:"foreignKey:user_id;references:id"`
+	Address 	[]Address 	`gorm:"foreignKey:user_id;references:id"`
+	UserLikeProduct []Product `gorm:"many2many:user_like_product;foreignKey:id;joinForeignKey:user_id;references:id;joinReferences:product_id"`
 }
 
 func (u *User) TableName() string {
