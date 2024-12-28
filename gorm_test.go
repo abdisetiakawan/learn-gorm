@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
 )
 
@@ -274,5 +275,58 @@ func TestSelectedColumns(t *testing.T) {
                 LastName: "Setiawan",
             },
             }).Error
+    assert.Nil(t, err)
+}
+
+func TestAutoIncrement(t *testing.T) {
+    for i := 0; i < 10; i++ {
+        userLog := UserLog{
+            UserId: "1",
+            Action: "Test Action",
+        }
+        err := db.Create(&userLog).Error
+        fmt.Println(userLog)
+        assert.Nil(t, err)
+    }
+}
+
+func TestSaveAtauUpdate(t *testing.T) {
+    userLog := UserLog{
+        UserId: "satu",
+        Action: "Halah Sia BOYYYYY",
+    }
+    err := db.Save(&userLog).Error
+    assert.Nil(t, err)
+    userLog.UserId = "satusatu"
+    err = db.Save(&userLog).Error
+    assert.Nil(t, err)
+}
+
+
+func TestSaveAtauUpdateNonIncrement(t *testing.T) {
+    userLog := User{
+        ID: "12221",
+        Name: Name{
+            FirstName: "kacauuuuuu",
+        },
+    }
+    err := db.Save(&userLog).Error
+    assert.Nil(t, err)
+    userLog.Name.FirstName = "kacauuuuu v2"
+    err = db.Save(&userLog).Error
+    assert.Nil(t, err)
+
+}
+
+func TestConflict(t *testing.T) {
+    user := User{
+        ID: "99",
+        Name: Name{
+            FirstName: "kacau v2",
+        },
+    }
+    err := db.Clauses(clause.OnConflict{
+        UpdateAll: true,
+    }).Create(&user).Error
     assert.Nil(t, err)
 }

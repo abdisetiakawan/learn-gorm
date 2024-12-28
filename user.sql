@@ -23,6 +23,28 @@ alter table users
 select *
 from users; 
 
+create table user_logs
+(
+    id          INT          AUTO_INCREMENT,
+    user_id     varchar(100) not null,
+    action      varchar(100) not null,
+    created_at timestamp    not null default current_timestamp,
+    updated_at timestamp    not null default current_timestamp on update current_timestamp,
+    primary key (id)
+) engine = InnoDB;
 
-
+SELECT * FROM user_logs;
 SHOW DATABASES;
+
+DELETE FROM user_logs;
+
+DELETE FROM user_logs;
+
+ALTER TABLE user_logs
+    MODIFY updated_at BIGINT not null;
+ALTER TABLE user_logs
+    MODIFY created_at BIGINT not null;
+
+SELECT * FROM user_logs;
+
+DESC user_logs;
