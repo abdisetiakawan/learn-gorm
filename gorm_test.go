@@ -378,3 +378,47 @@ func TestUnscoped(t *testing.T) {
     err = db.Unscoped().Find(&todos).Error
     assert.Nil(t, err)
 }
+
+func TestLock(t *testing.T) {
+    err := db.Transaction(func(tx *gorm.DB) error {
+        var user User
+        err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Take(&user, "id = ?", "10").Error
+        if err != nil {
+            return err
+        }
+
+        user.Password = "Sudah digantin dengan Locking"
+        user.Name.FirstName = "Abdi Locking"
+        err = tx.Save(&user).Error
+        return err
+    })
+    assert.Nil(t, err)
+}
+
+func TestCreateWallet(t *testing.T) {
+    wallet := Wallet{
+        ID: "1",
+        UserId: "10",
+        Balance: 10000,
+    }
+    err := db.Create(&wallet).Error
+    assert.Nil(t, err)
+}
+
+func TestRetrieveRelation(t *testing.T) {
+    var user User
+    err := db.Model(&User{}).Preload("Wallet").Take(&user, "id = ?", "10").Error
+    assert.Nil(t, err)
+
+    assert.Equal(t, "10", user.ID)
+    assert.Equal(t, "10", user.Wallet.UserId)
+}
+
+func TestRetrieveRelationJoin(t *testing.T) {
+    var user User
+    err := db.Model(&User{}).Joins("Wallet").Take(&user, "users.id = ?", "10").Error
+    assert.Nil(t, err)
+
+    assert.Equal(t, "10", user.ID)
+    assert.Equal(t, "10", user.Wallet.UserId)
+}

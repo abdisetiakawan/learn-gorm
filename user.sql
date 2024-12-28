@@ -49,3 +49,16 @@ ALTER TABLE user_logs
 SELECT * FROM user_logs;
 
 DESC user_logs;
+
+CREATE TABLE wallets
+(
+    id VARCHAR(100) NOT NULL,
+    user_id VARCHAR(100) NOT NULL,
+    balance BIGINT NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    PRIMARY KEY (id),
+    Foreign Key (user_id) REFERENCES users(id)
+)
+
+SELECT * FROM wallets;

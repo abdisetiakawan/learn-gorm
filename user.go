@@ -8,12 +8,13 @@ import (
 
 // field gorm ini sebenarnya tidak digunakan tidak masalah, karna sudah otomatis dari go
 type User struct {
-	ID        string	`gorm:"column:id;<-:create"` 
-	Name  	  Name		`gorm:"embedded"`
-	Password  string	`gorm:"column:password"`
-	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime;<-:create"`
-	UpdatedAt time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
-	Information string 	`gorm:"-"`
+	ID        	string		`gorm:"column:id;<-:create"` 
+	Name  	  	Name		`gorm:"embedded"`
+	Password  	string		`gorm:"column:password"`
+	CreatedAt 	time.Time 	`gorm:"column:created_at;autoCreateTime;<-:create"`
+	UpdatedAt 	time.Time 	`gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+	Information string 		`gorm:"-"`
+	Wallet 		Wallet 		`gorm:"foreignKey:user_id;references:id"`
 }
 
 func (u *User) TableName() string {
